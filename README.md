@@ -8,31 +8,36 @@ implementation patterns.
   The ASP.NET Core project used throughout the course.
 
 ## Settings and Configuration
-All client IDs, secrets, URLs, and configuration values used throughout the course are collected in the [Settings.md](Settings.md) file. 
+* **[Settings.md](Settings.md)**  
+  All client IDs, secrets, URLs, and configuration values used throughout the course.
 
 ## Links and Resources
-All external references mentioned in the course are collected in the [Resources.md](Resources.md) file.
+* **[Resources.md](Resources.md)**  
+  All external references mentioned throughout the course.
 
 ## Updates and Errata
-All course updates are listed in the [CHANGELOG.md](CHANGELOG.md) file. Known errors and corrections can be found in the [ERRATA.md](ERRATA.md) file.
-
-## Other Courses
-* **[Getting Started: Authentication and Authorization in .NET](https://dometrain.com/course/getting-started-authentication-and-authorization-in-dotnet/)**  
-  Learn how to get started with authentication and authorization in .NET
+* **[CHANGELOG.md](CHANGELOG.md)**  
+  All course updates.
+* **[ERRATA.md](ERRATA.md)**  
+  Known errors and corrections.
 
 ## Support and Bug Reports
-If one of the course's online services (such as the authorization server or the demo API) is down, please email tore@tn-data.se directly so it can be fixed as soon as possible.
-
-For anything else, such as a bug in the sample code or a general question, you can either email tore@tn-data.se or post an issue in the course material GitHub repository.
-
+* **An online service is down** (the authorization server or the demo API)  
+  Email tore@tn-data.se directly so it can be fixed as soon as possible.
+* **Anything else** (a bug in the sample code, or a general question)  
+  Email tore@tn-data.se or post an issue in the course material GitHub repository.
 
 ## Author
 **Tore Nestenius** is an independent consultant, trainer, and developer specializing in 
-security, authentication, and .NET. Feel free to reach out or follow along:
+security, authentication, and .NET. He is also a Microsoft .NET MVP. Feel free to reach out or follow along:
 
 * [Blog](https://nestenius.se)
 * [Web](https://tn-data.se)
 * [LinkedIn](https://www.linkedin.com/in/torenestenius/)
+
+## Other Courses
+* **[Getting Started: Authentication and Authorization in .NET](https://dometrain.com/course/getting-started-authentication-and-authorization-in-dotnet/)**  
+  Learn how to get started with authentication and authorization in .NET
 
 ## Frequently Asked Questions
 
