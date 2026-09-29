@@ -1,0 +1,72 @@
+@model OidcDemoApp.Features.Tokens.IntrospectViewModel
+@{
+    ViewData["Title"] = "Token Introspection";
+}
+
+<div class="demo-page">
+    <h1>Token introspection</h1>
+    <p class="text-muted">Send an access token (opaque or JWT) to the introspection endpoint to ask the authorization server whether it is still active.</p>
+
+    <form asp-controller="Tokens" asp-action="Introspect" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="ClientId" class="form-label"></label>
+            <div class="param-hint">The client authenticating the introspection call, not the client the token was issued to</div>
+            <input asp-for="ClientId" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ClientSecret" class="form-label"></label>
+            <input asp-for="ClientSecret" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Token" class="form-label">access_token</label>
+            <textarea asp-for="Token" class="form-control token-value" rows="8"></textarea>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="ReturnAsJwt" class="form-check-input" type="checkbox" />
+            <label asp-for="ReturnAsJwt" class="form-check-label"></label>
+            <div class="text-muted small">Requests the RFC 9701 JWT response format (<code>Accept: application/token-introspection+jwt</code>) instead of plain JSON.</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Introspect token</button>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Error))
+    {
+        <div class="alert alert-danger mt-4">@Model.Error</div>
+    }
+
+    @if (Model.StatusCode != null)
+    {
+        <h2 class="h4 mt-4">Result</h2>
+        <p class="text-muted">Called <code>@(OidcDemoApp.Settings.OIDCServer)/connect/introspect</code>, HTTP status <strong>@Model.StatusCode</strong></p>
+
+        @if (Model.IsActive != null)
+        {
+            <div class="alert @(Model.IsActive == true ? "alert-success" : "alert-secondary") mt-3">
+                <strong>active: @Model.IsActive.ToString()!.ToLowerInvariant()</strong>
+                @if (!string.IsNullOrEmpty(Model.ExpiryDisplay))
+                {
+                    <text> - </text>
+                    <span class="@(Model.IsExpired == true ? "text-danger" : "text-success") fw-bold">@Model.ExpiryDisplay</span>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.RawResult))
+        {
+            <h3 class="h6 mt-3">@(Model.ReturnAsJwt ? "Raw JWT response" : "Raw JSON response")</h3>
+            <pre class="token-value">@Model.RawResult</pre>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.DecodedResult))
+        {
+            <h3 class="h6 mt-3">Decoded token_introspection payload</h3>
+            <pre class="token-value">@Model.DecodedResult</pre>
+        }
+    }
+</div>

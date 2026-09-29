@@ -1,0 +1,34 @@
+// This example shows how an external identity is mapped to a local user
+// in our OpenID Provider.
+//
+// This mapping associates the Alice/alice account from
+// demo.duendesoftware.com with a local user account. Once we've
+// identified the external user, we can add our own claims and roles.
+
+new TestUser
+{
+	SubjectId = "4",				// Our Local Subject Identifier (user ID)
+
+	ProviderSubjectId = "1",		// The external subject Identifier (User ID)
+	ProviderName="oidc",			// Our name of the external provider)
+
+	Claims =
+	{
+		new Claim(JwtClaimTypes.Name, "ALICE CONSULTING"),
+		new Claim(JwtClaimTypes.GivenName, "Alice"),
+		new Claim(JwtClaimTypes.FamilyName, "Johansson"),
+		new Claim(JwtClaimTypes.Email, "Alice@example.com"),
+		new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
+		new Claim(JwtClaimTypes.PhoneNumber, "+46-201-1234567"),
+		new Claim(JwtClaimTypes.PhoneNumberVerified,"false"),
+		new Claim(JwtClaimTypes.WebSite, "http://aliceconsulting.com"),
+		new Claim(JwtClaimTypes.Address, JsonSerializer.Serialize(address), IdentityServerConstants.ClaimValueTypes.Json),
+
+						
+		//custom claims
+		new Claim("seniority","Contractor"),
+		new Claim("contractor","yes"),
+		new Claim("employee","no"),
+		new Claim("role","sales"),
+	}
+},

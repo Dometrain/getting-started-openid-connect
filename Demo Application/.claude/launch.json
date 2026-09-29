@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "OidcDemoApp",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "OidcDemoApp", "--launch-profile", "https", "--no-build"],
+      "port": 5001,
+      "url": "https://localhost:5001"
+    }
+  ]
+}

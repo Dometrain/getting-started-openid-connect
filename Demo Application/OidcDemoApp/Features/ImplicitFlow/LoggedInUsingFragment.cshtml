@@ -1,0 +1,74 @@
+@{
+    ViewData["Title"] = "Tokens Received";
+}
+
+<div class="demo-page">
+    <h1>Authenticated using the implicit flow</h1>
+    <p class="text-muted">These values were read from the URL fragment.</p>
+
+    <h2 class="h4 mt-4">Token details</h2>
+    <table class="table table-bordered param-table">
+        <tr>
+            <th>scope</th>
+            <td id="scope"></td>
+        </tr>
+        <tr>
+            <th>expires_in</th>
+            <td id="expires_in"></td>
+        </tr>
+        <tr>
+            <th>token_type</th>
+            <td id="token_type"></td>
+        </tr>
+        <tr>
+            <th>state</th>
+            <td id="state"></td>
+        </tr>
+        <tr>
+            <th>error</th>
+            <td id="error"></td>
+        </tr>
+        <tr>
+            <th>error_description</th>
+            <td id="error_description"></td>
+        </tr>
+        <tr>
+            <th>id_token<br /><span id="jwt_io_idtokenurl"></span></th>
+            <td id="id_token" class="token-value"></td>
+        </tr>
+        <tr>
+            <th>access_token<br /><span id="jwt_io_accessurl"></span></th>
+            <td id="access_token" class="token-value"></td>
+        </tr>
+    </table>
+</div>
+
+@section scripts {
+    <script>
+        //This script will take the content from the URL fragment and display it on the page
+        $(document).ready(function () {
+
+            var hash = window.location.hash.substring(1);
+            var params = {};
+            hash.split('&').forEach(pair => {
+                let parts = pair.split('=');
+                if (parts.length === 2) {
+                    params[parts[0]] = decodeURIComponent(parts[1]);
+                }
+            });
+
+            $("#scope").text(params.scope);
+            $("#expires_in").text(params.expires_in);
+            $("#token_type").text(params.token_type);
+            $("#state").text(params.state);
+            $("#error").text(params.error);
+            $("#error_description").text(params.error_description);
+
+            $("#id_token").text(params.id_token);
+            $("#access_token").text(params.access_token);
+
+            $("#jwt_io_idtokenurl").html('<a href="https://jwt.io/#value=' + encodeURIComponent(params.id_token) + '" target="_blank">jwt.io</a>');
+            $("#jwt_io_accessurl").html('<a href="https://jwt.io/#value=' + encodeURIComponent(params.access_token) + '" target="_blank">jwt.io</a>');
+        });
+    </script>
+}

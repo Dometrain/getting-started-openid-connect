@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Authorize URL";
+}
+
+<div class="demo-page">
+    <h1>Authorize URL created</h1>
+
+    @{
+        var state = ViewData["state"] as string;
+        var nonce = ViewData["nonce"] as string;
+    }
+    @if (string.IsNullOrEmpty(state) || string.IsNullOrEmpty(nonce))
+    {
+        <div class="alert alert-warning">Did you forget to set the state and/or nonce?</div>
+    }
+
+    <a class="btn btn-primary" href="@(ViewData["loginurl"])">Login to the authorization server</a>
+
+    <p class="mt-4 mb-1">This is the URL you will be sent to:</p>
+    <code class="token-value">@Html.Raw(ViewData["loginurl"]?.ToString()?.Replace("&", "<br>&amp;"))</code>
+</div>

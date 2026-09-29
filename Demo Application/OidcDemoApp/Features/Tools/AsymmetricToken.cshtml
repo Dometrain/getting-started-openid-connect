@@ -1,0 +1,176 @@
+@using OidcDemoApp.Features.Tools
+@model AsymmetricTokenViewModel
+
+@{
+    ViewData["Title"] = "Asymmetric Signed Token Generator";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4">Asymmetric signed token generator</h1>
+    <p>
+        The same JWT as the symmetric generator builds, signed with RS256 instead of HS256.
+        Everything up to the signing input is identical. What changes is the key: this page
+        signs with a private key, and the signature can then be verified with the matching
+        public key, by anyone, without them ever seeing the private one.
+    </p>
+
+    <form method="post" class="token-builder-form">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Header" class="form-label fw-semibold"></label>
+                <textarea asp-for="Header" class="form-control token-value jwt-source" rows="5"></textarea>
+                <div class="param-hint mt-1">
+                    <code>alg</code> is <code>RS256</code> now: RSA with SHA-256. It tells whoever
+                    receives this token that a public key, not a shared secret, is what verifies it.
+                </div>
+                @if (Model.HeaderWarning != null)
+                {
+                    <div class="text-danger small mt-1">@Model.HeaderWarning</div>
+                }
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Payload" class="form-label fw-semibold"></label>
+                <textarea asp-for="Payload" class="form-control token-value jwt-source" rows="12"></textarea>
+                <div class="param-hint mt-1">
+                    The same claims the symmetric generator uses, with one exception:
+                    <code>iss</code> is this application's own address, because this token really
+                    is minted here rather than by the OpenID Provider.
+                </div>
+                @if (Model.PayloadWarning != null)
+                {
+                    <div class="text-danger small mt-1">@Model.PayloadWarning</div>
+                }
+            </div>
+        </div>
+
+        <div class="mt-3 mb-2">
+            <button type="submit" asp-action="EncodeAsymmetricToken" class="btn btn-primary">
+                Step 1: Base64url encode
+            </button>
+            <button type="submit" asp-action="ResetAsymmetricToken" class="btn btn-outline-secondary ms-1">
+                Reset to defaults
+            </button>
+        </div>
+
+        @if (Model.Stage >= TokenBuildStage.Encoded)
+        {
+            <div class="jwt-stale-notice text-danger small" data-stale-for="encoded-steps">
+                The header or payload has changed. Press <span class="fw-semibold">Step 1: Base64url encode</span>
+                to encode the new version.
+            </div>
+
+            <div class="jwt-step-group" id="encoded-steps">
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Base64url encode each part&nbsp;&nbsp;&darr;</div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <pre class="jwt-box token-value jwt-header">@Model.EncodedHeader</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <pre class="jwt-box token-value jwt-payload">@Model.EncodedPayload</pre>
+                    </div>
+                </div>
+
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Join them with a dot&nbsp;&nbsp;&darr;</div>
+
+                <label class="form-label fw-semibold">Signing input</label>
+                <pre class="jwt-box token-value mb-1"><span class="jwt-header">@Model.EncodedHeader</span>.<span class="jwt-payload">@Model.EncodedPayload</span></pre>
+                <div class="param-hint">
+                    Built exactly as the symmetric page builds it: encode each part, join with a
+                    dot. Nothing about a JWT changes because of the algorithm until the moment it
+                    is signed.
+                </div>
+            </div>
+
+            <div class="jwt-flow-arrow mt-4">&darr;&nbsp;&nbsp;One key pair, two different jobs&nbsp;&nbsp;&darr;</div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Private key</label>
+                    <span class="badge bg-danger text-white ms-1">Signs</span>
+                    <pre class="jwt-box token-value pem-box">@AsymmetricTokenViewModel.PrivateKeyPem</pre>
+                    <div class="param-hint mt-1">
+                        Kept by whoever issues tokens, and by nobody else. In a real system this
+                        never leaves the authorization server. It is printed here only because this
+                        is a teaching application.
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Public key</label>
+                    <span class="badge bg-success text-white ms-1">Verifies</span>
+                    <pre class="jwt-box token-value pem-box">@AsymmetricTokenViewModel.PublicKeyPem</pre>
+                    <div class="param-hint mt-1">
+                        Derived from the private key, and safe to hand to anyone. It can check a
+                        signature but cannot produce one.
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-button mt-2 d-block"
+                                data-value="@AsymmetricTokenViewModel.PublicKeyPem">
+                            Copy public key
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="param-hint mt-2">
+                These two keys are a fixed pair, generated once and built into this application.
+                Where keys like these come from, and what is actually inside them, is the subject
+                of the next video.
+            </div>
+
+            <div class="mt-3 mb-3">
+                <button type="submit" asp-action="SignAsymmetricToken" class="btn btn-primary">
+                    Step 2: Sign with the private key
+                </button>
+            </div>
+        }
+
+        @if (Model.Stage == TokenBuildStage.Complete)
+        {
+            <div class="jwt-stale-notice text-danger small" data-stale-for="signed-steps">
+                Something above has changed. Press <span class="fw-semibold">Step 2: Sign with the private key</span>
+                to sign the new version.
+            </div>
+
+            <div class="jwt-step-group" id="signed-steps">
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;RSA-SHA256(signing input, private key)&nbsp;&nbsp;&darr;</div>
+
+                <label class="form-label fw-semibold">Signature</label>
+                <pre class="jwt-box token-value jwt-signature mb-1">@Model.Signature</pre>
+                <div class="param-hint">
+                    Longer than the HS256 signature, because an RSA signature is the size of the
+                    key: 2048 bits, or 256 bytes, rather than the 32 bytes a SHA-256 hash produces.
+                    Only the private key could have produced it.
+                </div>
+
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Join all three with dots&nbsp;&nbsp;&darr;</div>
+
+                <label class="form-label fw-semibold">Complete token</label>
+                <pre class="jwt-box token-value mb-2"><span class="jwt-header">@Model.EncodedHeader</span>.<span class="jwt-payload">@Model.EncodedPayload</span>.<span class="jwt-signature">@Model.Signature</span></pre>
+
+                <button type="button" class="btn btn-outline-secondary copy-button" data-value="@Model.Token">Copy token</button>
+
+                <div class="jwt-flow-arrow mt-4">&darr;&nbsp;&nbsp;Step 3: Verify it somewhere else&nbsp;&nbsp;&darr;</div>
+
+                <div class="param-hint">
+                    Open <a href="https://jwt.io" target="_blank" rel="noopener">jwt.io</a>, paste the
+                    token above, then paste the public key into its signature verification box. It
+                    reports the signature as verified, using nothing but the public key. That is the
+                    whole difference from the symmetric demo: there, verifying meant handing over the
+                    one key that also mints tokens. Here the verifier gets a key that can only check,
+                    which is why handing it to a website you do not control costs you nothing.
+                </div>
+
+                <div class="param-hint mt-2">
+                    Unlike the symmetric token, this one is not meant for the payment API. The API
+                    has never been given this public key, so it has no way to verify the signature.
+                    How a receiver gets hold of the right public key is a subject of its own.
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/token-builder.js" asp-append-version="true"></script>
+}

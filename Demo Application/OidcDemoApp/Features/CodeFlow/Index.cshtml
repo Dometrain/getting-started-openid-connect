@@ -1,0 +1,63 @@
+@model OidcDemoApp.Models.AuthorizeRequest
+@{
+    ViewData["Title"] = "Authorization Code Flow";
+}
+
+<div class="demo-page">
+    <h1>Authorization code flow</h1>
+    <p class="text-muted">Construct a login link using the authorization code flow.</p>
+
+    <form asp-controller="CodeFlow" asp-action="GetAuthCode" method="post">
+        <h2 class="h4 mt-4">Create the login link</h2>
+
+        <div class="mb-3">
+            <label asp-for="ResponseType" class="form-label">response_type</label>
+            <div class="param-hint">What do I want to get back? <strong>code</strong> means authorization code</div>
+            <input asp-for="ResponseType" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ClientId" class="form-label">client_id</label>
+            <div class="param-hint">The client identifier</div>
+            <input asp-for="ClientId" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Scope" class="form-label">scope</label>
+            <div class="param-hint">What do I want to have access to? Can be any of <strong>openid email profile phone address employee_info api payment</strong>. The <strong>openid</strong> scope is required.</div>
+            <input asp-for="Scope" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Prompt" class="form-label">prompt</label>
+            <div class="param-hint">Should the authorization server prompt me to reauthenticate and consent again? Options: <strong>none, login, consent, select_account</strong>.</div>
+            <input asp-for="Prompt" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="State" class="form-label">state</label>
+            <div class="param-hint">Opaque value used to maintain state between the request and the callback.</div>
+            <input asp-for="State" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Nonce" class="form-label">nonce</label>
+            <div class="param-hint">Value used to associate a client session with an ID token, and to mitigate replay attacks.</div>
+            <input asp-for="Nonce" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ResponseMode" class="form-label">response_mode</label>
+            <div class="param-hint">Send the token response as a form post instead of a fragment encoded redirect.</div>
+            <input asp-for="ResponseMode" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RedirectUri" class="form-label">redirect_uri</label>
+            <div class="param-hint">Where the authorization server sends the browser back to after login.</div>
+            <input asp-for="RedirectUri" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create login link</button>
+    </form>
+</div>

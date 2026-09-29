@@ -1,0 +1,60 @@
+@{
+    ViewData["Title"] = "User Info";
+}
+
+<div class="demo-page">
+    <h1>User info</h1>
+    <p class="text-muted">What this app knows about the current user, from the signed-in cookie.</p>
+
+    @foreach (var identity in User.Identities)
+    {
+        <h2 class="h5 mt-4">@(identity.Name ?? "Unknown")</h2>
+        <dl class="row">
+            <dt class="col-sm-3">AuthenticationType</dt>
+            <dd class="col-sm-9">@identity.AuthenticationType</dd>
+
+            <dt class="col-sm-3">IsAuthenticated</dt>
+            <dd class="col-sm-9">@identity.IsAuthenticated</dd>
+
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@(identity.Name ?? "Unknown")</dd>
+        </dl>
+
+        <h3 class="h6 mt-3">Claims</h3>
+        <table class="table table-bordered param-table">
+            @foreach (var claim in identity.Claims)
+            {
+                <tr>
+                    <th>@claim.Type</th>
+                    <td>@claim.Value</td>
+                </tr>
+            }
+        </table>
+
+        <h3 class="h6 mt-3">Tokens</h3>
+        <table class="table table-bordered param-table">
+            <tr>
+                <th>id_token<br /><span id="jwt_io_idtokenurl"></span></th>
+                <td id="id_token" class="token-value">@ViewData["idToken"]</td>
+            </tr>
+            <tr>
+                <th>access_token<br /><span id="jwt_io_accessurl"></span></th>
+                <td id="access_token" class="token-value">@ViewData["accessToken"]</td>
+            </tr>
+            <tr>
+                <th>refresh_token<br /><span id="jwt_io_refreshtokenurl"></span></th>
+                <td id="refresh_token" class="token-value">@ViewData["refreshToken"]</td>
+            </tr>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#jwt_io_idtokenurl").html('<a href="https://jwt.io/#value=' + encodeURIComponent('@ViewData["idToken"]') + '" target="_blank">jwt.io</a>');
+            $("#jwt_io_accessurl").html('<a href="https://jwt.io/#value=' + encodeURIComponent('@ViewData["accessToken"]') + '" target="_blank">jwt.io</a>');
+            $("#jwt_io_refreshtokenurl").html('<a href="https://jwt.io/#value=' + encodeURIComponent('@ViewData["refreshToken"]') + '" target="_blank">jwt.io</a>');
+        });
+    </script>
+}

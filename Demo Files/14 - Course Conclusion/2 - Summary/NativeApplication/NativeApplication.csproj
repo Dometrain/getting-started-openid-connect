@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>NativeApplication</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    This is a plain console application, not an ASP.NET Core web application.
+
+    It still needs a web server for a few seconds, because the authorization server
+    delivers the authorization code by redirecting the browser back to this machine.
+    Something has to be listening on the other end of that redirect.
+
+    The redirect URI registered for this demo client is HTTPS, so we need a listener
+    that can serve HTTPS with the ASP.NET Core development certificate. Referencing
+    the ASP.NET Core framework gives us Kestrel for exactly that, without turning
+    this into a web project.
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>

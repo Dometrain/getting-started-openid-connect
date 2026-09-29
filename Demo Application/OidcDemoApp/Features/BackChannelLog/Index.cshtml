@@ -1,0 +1,99 @@
+@model IReadOnlyList<OidcDemoApp.Infrastructure.BackChannelLogger.BackChannelLogEntry>
+@{
+    ViewData["Title"] = "Back-Channel Log";
+}
+
+<h2>Back-Channel Log</h2>
+<p class="text-muted">
+    Shows the back-channel traffic to the authorization server.
+    Total: <strong>@Model.Count</strong> call(s).
+</p>
+
+<form asp-action="Clear" method="post" class="mb-3">
+    <button type="submit" class="btn btn-outline-danger btn-sm"
+            onclick="return confirm('Clear all log entries?')">
+        Clear log
+    </button>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No back-channel calls recorded yet. Try logging in or out.
+    </div>
+}
+else
+{
+    @foreach (var entry in Model)
+    {
+        var cardClass = entry.IsError ? "border-danger" : "border-secondary";
+        var badgeClass = entry.IsError ? "bg-danger" : "bg-success";
+        var statusText = entry.ResponseStatusCode.HasValue
+            ? entry.ResponseStatusCode.ToString()
+            : "n/a";
+
+        <div class="card mb-3 @cardClass">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <strong>#@entry.Index</strong>
+                    &nbsp;
+                    <span class="badge bg-primary">@entry.RequestMethod</span>
+                    &nbsp;
+                    <span class="badge @badgeClass">HTTP @statusText</span>
+                    &nbsp;
+                    <code>@entry.RequestUrl</code>
+                </span>
+                <span class="text-muted small text-nowrap">
+                    @entry.Timestamp.ToString("HH:mm:ss")
+                    &nbsp;|&nbsp; @entry.Duration.TotalMilliseconds.ToString("F0") ms
+                </span>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="row g-0">
+
+                    @* Request *@
+                    <div class="col-md-6 border-end p-3">
+                        <h6 class="text-primary">Request</h6>
+                        <div class="mb-1">
+                            <strong>URL:</strong><br />
+                            <code class="text-break">@entry.RequestUrl</code>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(entry.RequestBody))
+                        {
+                            <div class="mt-2">
+                                <strong>Body:</strong>
+                                <pre class="bg-light border rounded p-2 mt-1" style="font-size:0.78rem; white-space:pre-wrap; word-break:break-all;">@entry.PrettyRequestBody</pre>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted small mt-1">(no body)</div>
+                        }
+                    </div>
+
+                    @* Response *@
+                    <div class="col-md-6 p-3">
+                        <h6 class="text-success">Response</h6>
+                        <div class="mb-1">
+                            <strong>Status:</strong>
+                            <span class="badge @badgeClass">@statusText</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(entry.ResponseBody))
+                        {
+                            <div class="mt-2">
+                                <strong>Body:</strong>
+                                <pre class="bg-light border rounded p-2 mt-1" style="font-size:0.78rem; white-space:pre-wrap; word-break:break-all;">@entry.PrettyResponseBody</pre>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted small mt-1">(no body)</div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+}

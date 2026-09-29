@@ -1,0 +1,129 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Demo pages: the flow walkthroughs (authorize form, token result, back-channel log) */
+
+.demo-page {
+  max-width: 980px;
+}
+
+.param-table th {
+  width: 200px;
+  white-space: nowrap;
+}
+
+.param-hint {
+  font-size: 0.875rem;
+  color: var(--bs-secondary-color, #6c757d);
+  margin-bottom: 0.25rem;
+}
+
+/* Endpoint buttons stacked one per row, each with its access rule to the right.
+   The fixed width keeps every button the same size so the rules line up. */
+.endpoint-button {
+  min-width: 13rem;
+  flex: none;
+  text-align: left;
+}
+
+.token-value {
+  font-family: var(--bs-font-monospace, monospace);
+  font-size: 0.85rem;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+/* Symmetric token generator: the step-by-step pipeline from JSON to a signed token.
+   The arrows label what each step does, mirroring the diagram on the slides. */
+.jwt-flow-arrow {
+  text-align: center;
+  color: var(--bs-primary, #0d6efd);
+  font-size: 0.875rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.jwt-box {
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.375rem;
+  background-color: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+}
+
+/* The three segments are colour-coded the way jwt.io does it, so each part of the
+   complete token maps back to the box it came from. */
+.jwt-header {
+  color: #c2185b;
+}
+
+.jwt-payload {
+  color: #7b1fa2;
+}
+
+.jwt-signature {
+  color: #0277bd;
+}
+
+/* PEM keys are shown in full, never truncated: the point of the asymmetric demo is that
+   the public key is safe to read out and copy anywhere. A 2048-bit private key is around
+   28 lines, so it is set smaller to keep both keys side by side on one screen. */
+.pem-box {
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+/* at_hash calculator: only the left-most half of the digest ends up in the claim. The two
+   halves are shown together, with the discarded one struck through rather than hidden,
+   because the truncation is the step the page exists to make visible. */
+.hash-kept {
+  color: #0277bd;
+  font-weight: 600;
+}
+
+.hash-discarded {
+  color: var(--bs-secondary-color, #6c757d);
+  text-decoration: line-through;
+}
+
+/* A step's output stops matching the fields above it the moment they are edited. The
+   group is dimmed and its notice appears, so nobody reads a stale token off the screen. */
+.jwt-step-group.is-stale {
+  opacity: 0.35;
+}
+
+.jwt-stale-notice {
+  display: none;
+  margin-top: 1rem;
+}
+
+.jwt-stale-notice.is-visible {
+  display: block;
+}
+/* Combining the flows: two side-by-side panes. Long JWTs and JSON scroll inside their
+   own box instead of wrapping, so both columns keep the same shape on screen. */
+.flow-pane {
+  font-family: var(--bs-font-monospace, monospace);
+  font-size: 0.8rem;
+  white-space: pre;
+  overflow: auto;
+  max-height: 22rem;
+}

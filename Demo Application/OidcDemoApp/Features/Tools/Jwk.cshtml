@@ -1,0 +1,76 @@
+@model OidcDemoApp.Features.Tools.JwkViewModel
+
+@{
+    ViewData["Title"] = "PEM to JWK Converter";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4">PEM to JWK converter</h1>
+    <p>
+        OpenSSL writes keys as PEM. OpenID Connect describes them as JSON, in a JWK. This
+        converts one into the other. Paste an RSA or elliptic curve key, private or public,
+        and see the same numbers written the other way.
+    </p>
+
+    <form method="post" asp-action="Jwk">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="Pem" class="form-label fw-semibold"></label>
+            <textarea asp-for="Pem" class="form-control token-value pem-box" rows="12"
+                      placeholder="-----BEGIN PUBLIC KEY-----"></textarea>
+            <div class="param-hint mt-1">
+                Paste the whole PEM block, BEGIN and END lines included. Generate one with
+                <code>openssl genrsa</code> or <code>openssl ecparam</code>, or export the public
+                half with <code>openssl pkey -pubout</code>.
+            </div>
+            @if (Model.Error != null)
+            {
+                <div class="text-danger small mt-1">@Model.Error</div>
+            }
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Convert to JWK</button>
+        </div>
+    </form>
+
+    @if (Model.Jwk != null)
+    {
+        <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;The same key, written as JSON&nbsp;&nbsp;&darr;</div>
+
+        <label class="form-label fw-semibold">Public JWK</label>
+        <span class="param-hint ms-1">@Model.Description</span>
+        <pre class="jwt-box token-value mb-2">@Model.Jwk</pre>
+        <button type="button" class="btn btn-sm btn-outline-secondary copy-button" data-value="@Model.Jwk">Copy JWK</button>
+
+        <div class="param-hint mt-2">
+            <code>kid</code> is the key's thumbprint (RFC 7638): a SHA-256 over the key's own
+            required members. It is not a name someone picked, which is why two systems holding
+            the same key arrive at the same <code>kid</code>, and how a validator knows which
+            published key to use for a token.
+        </div>
+
+        @if (Model.PrivateJwk != null)
+        {
+            <div class="jwt-flow-arrow mt-4">&darr;&nbsp;&nbsp;The same key, private half included&nbsp;&nbsp;&darr;</div>
+
+            <label class="form-label fw-semibold">Private JWK</label>
+            <span class="badge bg-danger text-white ms-1">Never publish this</span>
+            <div class="text-danger small mt-1 mb-1">
+                This contains the private key. Anyone holding it can mint tokens in your name.
+            </div>
+            <pre class="jwt-box token-value mb-2">@Model.PrivateJwk</pre>
+            <button type="button" class="btn btn-sm btn-outline-secondary copy-button" data-value="@Model.PrivateJwk">Copy private JWK</button>
+
+            <div class="param-hint mt-2 fw-semibold">
+                This form is never published. What a provider serves at its <code>jwks_uri</code>
+                is the public one above, wrapped in a key set.
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/token-builder.js" asp-append-version="true"></script>
+}

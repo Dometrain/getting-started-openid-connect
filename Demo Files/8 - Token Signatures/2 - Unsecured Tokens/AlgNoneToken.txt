@@ -1,0 +1,30 @@
+### Sample alg:none token, you might need to update the expire times.
+
+
+{
+  "iss": "https://identityservice.secure.nu",
+  "nbf": 1786443953,
+  "iat": 1786443953,
+  "exp": 1786447553,
+  "aud": [
+    "payment"
+  ],
+  "scope": [
+    "openid",
+    "payment"
+  ],
+  "amr": [
+    "pwd"
+  ],
+  "client_id": "implicitflowclient",
+  "sub": "5",
+  "role": [
+    "ceo",
+    "finance",
+    "developer"
+  ],
+  "auth_time": 1786443951,
+  "idp": "local",
+  "sid": "12D919CAEAF035F92BEA4F39AE63ABAE",
+  "jti": "577906C0B44BE79A5F4F83AF18DB6330"
+}

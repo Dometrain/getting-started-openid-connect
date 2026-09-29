@@ -1,0 +1,48 @@
+@model OidcDemoApp.Features.Tokens.TokenModel
+@{
+    ViewData["Title"] = "Use an Access Token";
+}
+
+<div class="demo-page">
+    <h1>Use an access token</h1>
+    <p class="text-muted">Paste any access token and call one of the token-secured endpoints with it.</p>
+
+    <form asp-controller="Tokens" asp-action="Index" method="post">
+        <div class="mb-3">
+            <label asp-for="AccessToken" class="form-label">access_token</label>
+            <textarea asp-for="AccessToken" class="form-control token-value" rows="8"></textarea>
+        </div>
+        <div class="mb-4">
+            <div class="fw-semibold mb-2">OpenID Provider and time API</div>
+            <button type="submit" asp-controller="Tokens" asp-action="Index" class="btn btn-primary">Call userinfo endpoint</button>
+            <button type="submit" asp-controller="Tokens" asp-action="GetTime" class="btn btn-primary">Call get time endpoint</button>
+        </div>
+
+        <div class="mb-3">
+            <div class="fw-semibold mb-2">Protected payment API</div>
+            <div class="param-hint mb-2">
+                All three endpoints live on <code>https://paymentapi.secure.nu</code> and take the same bearer token,
+                but they do not ask the same things of it.
+            </div>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <button type="submit" asp-controller="Tokens" asp-action="PaymentApiIdentity" class="btn btn-primary endpoint-button">/identity</button>
+                <span class="param-hint mb-0">Any authenticated caller. Echoes back every claim on the token.</span>
+            </div>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <button type="submit" asp-controller="Tokens" asp-action="PaymentApiPayments" class="btn btn-primary endpoint-button">/payments</button>
+                <span class="param-hint mb-0">Requires <code>scope=payment</code> and <code>role=finance</code>.</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button type="submit" asp-controller="Tokens" asp-action="PaymentApiNewFeature" class="btn btn-primary endpoint-button">/payments/newfeature</button>
+                <span class="param-hint mb-0">Requires <code>scope=payment</code> and <code>role=developer</code>.</span>
+            </div>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.Result))
+    {
+        <h2 class="h4 mt-4">Result</h2>
+        <p class="text-muted">Called <code>@Model.CalledUrl</code></p>
+        <pre class="token-value">@Model.Result</pre>
+    }
+</div>

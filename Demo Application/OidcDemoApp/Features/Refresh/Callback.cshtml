@@ -1,0 +1,44 @@
+@model OidcDemoApp.Features.Refresh.AuthCode
+@{
+    ViewData["Title"] = "Callback";
+}
+
+<div class="demo-page">
+    <h1>Authorization code received</h1>
+    <p class="text-muted">This is what the authorization server sent back to the callback URL.</p>
+    <p class="text-muted mb-4">Token endpoint: <code class="token-value">@ViewData["tokenEndpoint"]</code></p>
+
+    <form asp-controller="Refresh" asp-action="GetTokens" method="post">
+        <div class="mb-3">
+            <label asp-for="Code" class="form-label">code</label>
+            <div class="param-hint">The authorization code</div>
+            <input asp-for="Code" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Scope" class="form-label">scope</label>
+            <div class="param-hint">The scopes requested (optional)</div>
+            <input asp-for="Scope" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="State" class="form-label">state</label>
+            <div class="param-hint">The state value</div>
+            <input asp-for="State" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SessionState" class="form-label">session_state</label>
+            <div class="param-hint">Session identifier (optional)</div>
+            <input asp-for="SessionState" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Iss" class="form-label">iss</label>
+            <div class="param-hint">Who issued this code (optional)</div>
+            <input asp-for="Iss" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Get the tokens</button>
+    </form>
+</div>

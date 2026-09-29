@@ -1,0 +1,19 @@
+﻿[*.cs]
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = none
+
+# IDE0037: Use inferred member name
+dotnet_diagnostic.IDE0037.severity = none
+
+# IDE0057: Use range operator
+dotnet_diagnostic.IDE0057.severity = none
+
+# SYSLIB1045: Convert to 'GeneratedRegexAttribute'.
+dotnet_diagnostic.SYSLIB1045.severity = none
+
+# CA1707: Remove underscores from names. Disabled because the flow controllers build
+# OAuth/OIDC request parameters (client_id, redirect_uri, code_verifier, etc.) as
+# anonymous-type properties named to match the wire format exactly, which CA1707 would
+# otherwise flag; every other member in the project is free of underscores.
+dotnet_diagnostic.CA1707.severity = none

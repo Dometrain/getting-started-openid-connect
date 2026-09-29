@@ -1,0 +1,96 @@
+@model OidcDemoApp.Features.Tools.HashViewModel
+
+@{
+    ViewData["Title"] = "Hash Calculator";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4">Hash Calculator</h1>
+    <p>Enter any text and see what each hash algorithm produces.</p>
+
+    <form method="post" asp-action="Hash">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="Input" class="form-label"></label>
+            <textarea asp-for="Input" class="form-control" rows="4"
+                      placeholder="Enter a string to hash..."></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">@Html.DisplayNameFor(m => m.Format)</label>
+            <div>
+                @foreach (var format in Enum.GetValues<OidcDemoApp.Features.Tools.HashOutputFormat>())
+                {
+                    <div class="form-check form-check-inline">
+                        <input asp-for="Format" class="form-check-input" type="radio"
+                               value="@format" id="format-@format" />
+                        <label class="form-check-label" for="format-@format">@format</label>
+                    </div>
+                }
+            </div>
+            <div class="text-muted small">
+                Base64Url is the form used inside JWTs. A SHA-256 hash written as Base64Url is
+                exactly what PKCE sends as the <code>code_challenge</code>.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Calculate</button>
+    </form>
+
+    @if (Model.Results.Count > 0)
+    {
+        <h2 class="h4 mt-4">Results</h2>
+
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th class="text-end">Bits</th>
+                    <th>Value</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var result in Model.Results)
+                {
+                    <tr>
+                        <td class="fw-semibold text-nowrap">@result.Algorithm</td>
+                        <td class="text-end text-muted">@result.Bits</td>
+                        <td class="token-value">@result.Value</td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-secondary copy-button"
+                                    data-value="@result.Value">Copy</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <p class="param-hint">
+            The 256, 384 and 512 in RS256, ES384 and HS512 refer to exactly these three sizes.
+        </p>
+
+        <p class="param-hint">
+            Looking for <code>at_hash</code>? It is not one of these digests. It is the left-most
+            half of one, base64url encoded, and the
+            <a asp-action="AtHash">at_hash calculator</a> shows that.
+        </p>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Copy a digest to the clipboard. Handy on camera: hash a code_verifier here, then
+        // paste the Base64Url result straight into the PKCE code_challenge field.
+        document.querySelectorAll(".copy-button").forEach(function (button) {
+            button.addEventListener("click", function () {
+                navigator.clipboard.writeText(button.dataset.value).then(function () {
+                    var original = button.textContent;
+                    button.textContent = "Copied";
+                    setTimeout(function () { button.textContent = original; }, 1200);
+                });
+            });
+        });
+    </script>
+}

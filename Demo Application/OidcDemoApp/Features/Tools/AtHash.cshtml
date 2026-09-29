@@ -1,0 +1,74 @@
+@model OidcDemoApp.Features.Tools.AtHashViewModel
+
+@{
+    ViewData["Title"] = "at_hash Calculator";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4"><code>at_hash</code> calculator</h1>
+    <p>
+        The <code>at_hash</code> claim inside an ID token binds an access token to that ID token,
+        proving the two were issued for the same sign-in. Paste an access token and see how the
+        value is built, step by step.
+    </p>
+
+    <form method="post" asp-action="AtHash">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="AccessToken" class="form-label fw-semibold"></label>
+            <textarea asp-for="AccessToken" class="form-control token-value" rows="6"
+                      placeholder="eyJhbGciOiJSUzI1NiIsIn..."></textarea>
+            <div class="param-hint mt-1">
+                The access token exactly as it was received. It does not have to be a JWT. An opaque
+                token works just as well, because what gets hashed is the string itself and never
+                anything inside it.
+            </div>
+        </div>
+
+        @if (Model.Error != null)
+        {
+            <div class="text-danger small mb-3">@Model.Error</div>
+        }
+
+        <button type="submit" class="btn btn-primary">Calculate at_hash</button>
+    </form>
+
+    @if (Model.Result is { } result)
+    {
+        <h2 class="h4 mt-4">What gets hashed</h2>
+
+        <pre class="jwt-box token-value mb-1">@result.HashedToken</pre>
+        <div class="param-hint">
+            The whole access token, all @result.HashedToken.Length characters of it, header, payload
+            and signature together. Nothing is decoded first.
+        </div>
+        @if (result.WhitespaceRemoved)
+        {
+            <div class="param-hint text-warning-emphasis">
+                Line breaks and spaces were removed before hashing. A token never contains any, so
+                these came from the copy and paste.
+            </div>
+        }
+
+        <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Hashed with SHA-256&nbsp;&nbsp;&darr;</div>
+
+        <label class="form-label fw-semibold">The digest, all @result.DigestBytes bytes of it</label>
+        <pre class="jwt-box token-value mb-1"><span class="hash-kept">@result.KeptHex</span><span class="hash-discarded">@result.DiscardedHex</span></pre>
+        <div class="param-hint">
+            This is the step people miss. Only the <span class="hash-kept">left-most half</span> is
+            used, @result.KeptBytes bytes of it. The
+            <span class="hash-discarded">remaining @result.KeptBytes bytes</span> are thrown away.
+        </div>
+
+        <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;The half that was kept, base64url encoded&nbsp;&nbsp;&darr;</div>
+
+        <label class="form-label fw-semibold"><code>at_hash</code></label>
+        <pre class="jwt-box token-value mb-2">@result.AtHash</pre>
+        <button type="button" class="btn btn-sm btn-outline-secondary copy-button" data-value="@result.AtHash">Copy at_hash</button>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/token-builder.js" asp-append-version="true"></script>
+}

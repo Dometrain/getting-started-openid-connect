@@ -1,0 +1,11 @@
+@model OidcDemoApp.Models.OidcTokenResponse
+@{
+    ViewData["Title"] = "Tokens";
+}
+
+<div class="demo-page">
+    <h1>Tokens received</h1>
+    <p class="text-muted">The authorization code was exchanged for these tokens at the token endpoint.</p>
+
+    <partial name="_TokenResult" />
+</div>

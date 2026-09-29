@@ -1,0 +1,67 @@
+@model OidcDemoApp.Features.Tools.Base64ViewModel
+
+@{
+    ViewData["Title"] = "Base64 Encode / Decode";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4">Base64 Encode / Decode</h1>
+    <p>Paste text below, then encode it to Base64 or decode a Base64 string back to text.</p>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="Input" class="form-label"></label>
+            <textarea asp-for="Input" class="form-control" rows="6"
+                      placeholder="Paste text or Base64 here..."></textarea>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="UseBase64Url" class="form-check-input" type="checkbox" />
+            <label asp-for="UseBase64Url" class="form-check-label"></label>
+            <div class="text-muted small">Base64Url uses '-' and '_' instead of '+' and '/', with no padding. This is the form used inside JWTs.</div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="PrettyPrintJson" class="form-check-input" type="checkbox" />
+            <label asp-for="PrettyPrintJson" class="form-check-label"></label>
+            <div class="text-muted small">When the decoded text starts with '{', it is indented so the JSON is easier to read.</div>
+        </div>
+
+        <button type="submit" asp-action="Base64Encode" class="btn btn-primary">Encode</button>
+        <button type="submit" asp-action="Base64Decode" class="btn btn-secondary">Decode</button>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Error))
+        {
+            <div class="alert alert-danger mt-3">@Model.Error</div>
+        }
+
+        <div class="mb-3 mt-3">
+            <label class="form-label">Output</label>
+            <textarea id="output" class="form-control" rows="6" readonly
+                      style="word-break: break-all; overflow-y: hidden;">@Model.Output</textarea>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        // Grow the output box to fit its content, so a decoded JWT payload is readable
+        // in one view instead of behind a scrollbar. The 'rows' value above stays the
+        // minimum height, which keeps the empty box looking the same as the input box.
+        (function () {
+            var output = document.getElementById("output");
+            if (!output) {
+                return;
+            }
+
+            var minHeight = output.offsetHeight;
+            var style = window.getComputedStyle(output);
+            var borders = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+
+            output.style.height = "auto";
+            output.style.height = Math.max(output.scrollHeight + borders, minHeight) + "px";
+        })();
+    </script>
+}

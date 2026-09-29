@@ -1,0 +1,156 @@
+@using OidcDemoApp.Features.Tools
+@model SymmetricTokenViewModel
+
+@{
+    ViewData["Title"] = "Symmetric Signed Token Generator";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4">Symmetric signed token generator</h1>
+    <p>
+        Build a JWT by hand and sign it with HS256, one step at a time. The header and
+        payload below are pre-filled with a token the payment API accepts, so you can
+        encode it, sign it, and use it straight away. Change anything and run the steps
+        again to watch what the API does with it.
+    </p>
+
+    <form method="post" class="token-builder-form">
+        @Html.AntiForgeryToken()
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Header" class="form-label fw-semibold"></label>
+                <textarea asp-for="Header" class="form-control token-value jwt-source" rows="5"></textarea>
+                <div class="param-hint mt-1">
+                    <code>alg</code> says how the token is signed. Change it and the API stops
+                    trusting the token, because it no longer matches how it was actually signed.
+                </div>
+                @if (Model.HeaderWarning != null)
+                {
+                    <div class="text-danger small mt-1">@Model.HeaderWarning</div>
+                }
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Payload" class="form-label fw-semibold"></label>
+                <textarea asp-for="Payload" class="form-control token-value jwt-source" rows="12"></textarea>
+                <div class="param-hint mt-1">
+                    <code>aud</code>, <code>scope</code> and <code>role</code> are what the payment
+                    API checks. <code>exp</code> is one hour from when this page was loaded.
+                </div>
+                @if (Model.PayloadWarning != null)
+                {
+                    <div class="text-danger small mt-1">@Model.PayloadWarning</div>
+                }
+            </div>
+        </div>
+
+        <div class="mt-3 mb-2">
+            <button type="submit" asp-action="EncodeSymmetricToken" class="btn btn-primary">
+                Step 1: Base64url encode
+            </button>
+            <button type="submit" asp-action="ResetSymmetricToken" class="btn btn-outline-secondary ms-1">
+                Reset to defaults
+            </button>
+        </div>
+
+        @if (Model.Stage >= TokenBuildStage.Encoded)
+        {
+            <div class="jwt-stale-notice text-danger small" data-stale-for="encoded-steps">
+                The header or payload has changed. Press <span class="fw-semibold">Step 1: Base64url encode</span>
+                to encode the new version.
+            </div>
+
+            <div class="jwt-step-group" id="encoded-steps">
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Base64url encode each part&nbsp;&nbsp;&darr;</div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <pre class="jwt-box token-value jwt-header">@Model.EncodedHeader</pre>
+                    </div>
+                    <div class="col-md-6">
+                        <pre class="jwt-box token-value jwt-payload">@Model.EncodedPayload</pre>
+                    </div>
+                </div>
+
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Join them with a dot&nbsp;&nbsp;&darr;</div>
+
+                <label class="form-label fw-semibold">Signing input</label>
+                <pre class="jwt-box token-value mb-1"><span class="jwt-header">@Model.EncodedHeader</span>.<span class="jwt-payload">@Model.EncodedPayload</span></pre>
+                <div class="param-hint">
+                    This exact string is what gets signed. Not the JSON, not the secret on its own:
+                    this. Change one character anywhere above and the signature below changes completely.
+                </div>
+            </div>
+
+            <div class="mt-4 mb-2">
+                <label asp-for="Secret" class="form-label fw-semibold"></label>
+                <input asp-for="Secret" class="form-control token-value jwt-secret" />
+                <div class="param-hint mt-1">
+                    The key for the HMAC, shared between whoever mints the token and whoever
+                    validates it. <span class="fw-semibold">@Model.SecretBits bits.</span>
+                    HMAC accepts a key of any length, which is why this page can sign with a short
+                    one. The 256-bit floor comes from the JWT spec: RFC 7518 says an HS256 key must
+                    be at least as long as the SHA-256 value it produces, because a key with fewer
+                    bits than the hash can be guessed faster than the hash can be broken. The extra
+                    hash bits buy you nothing once the key is the weakest part.
+                    @if (Model.SecretTooShort)
+                    {
+                        <span class="text-danger">
+                            This key is under 256 bits. Microsoft's validator enforces that limit
+                            exactly, so the payment API will reject the token without ever checking
+                            the signature.
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" asp-action="SignSymmetricToken" class="btn btn-primary">
+                    Step 2: Sign with HS256
+                </button>
+            </div>
+        }
+        else
+        {
+            @* Keeps the pre-filled secret through the encode round-trip, before the field
+               itself is on screen. The secret belongs to step two, not step one. *@
+            <input type="hidden" asp-for="Secret" />
+        }
+
+        @if (Model.Stage == TokenBuildStage.Complete)
+        {
+            <div class="jwt-stale-notice text-danger small" data-stale-for="signed-steps">
+                Something above has changed. Press <span class="fw-semibold">Step 2: Sign with HS256</span>
+                to sign the new version.
+            </div>
+
+            <div class="jwt-step-group" id="signed-steps">
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;HMAC-SHA256(signing input, secret)&nbsp;&nbsp;&darr;</div>
+
+                <label class="form-label fw-semibold">Signature</label>
+                <pre class="jwt-box token-value jwt-signature mb-1">@Model.Signature</pre>
+                <div class="param-hint">
+                    A keyed hash. Anyone can hash, but only someone holding the secret can produce
+                    this value, which is what makes it a signature rather than a checksum.
+                </div>
+
+                <div class="jwt-flow-arrow">&darr;&nbsp;&nbsp;Join all three with dots&nbsp;&nbsp;&darr;</div>
+
+                <label class="form-label fw-semibold">Complete token</label>
+                <pre class="jwt-box token-value mb-2"><span class="jwt-header">@Model.EncodedHeader</span>.<span class="jwt-payload">@Model.EncodedPayload</span>.<span class="jwt-signature">@Model.Signature</span></pre>
+
+                <button type="button" class="btn btn-outline-secondary copy-button" data-value="@Model.Token">Copy</button>
+
+                <div class="param-hint mt-2">
+                    Copy this and paste it into
+                    <a asp-controller="Tokens" asp-action="Index">Use an access token</a> to call the
+                    payment API with it.
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/token-builder.js" asp-append-version="true"></script>
+}

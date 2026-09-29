@@ -1,0 +1,28 @@
+@model OidcDemoApp.Features.CodeFlowPkce.CodeVerifier
+@{
+    ViewData["Title"] = "Code Challenge Calculator";
+}
+
+<div class="demo-page">
+    <h1>Code challenge calculator</h1>
+    <p class="text-muted">PKCE hashes a code verifier (43 to 128 characters) into a code challenge using SHA-256 and base64url encoding.</p>
+
+    <form asp-controller="CodeFlowPkce" asp-action="CalculateCodeChallenge" method="post">
+        <div class="mb-3">
+            <label asp-for="Verifier" class="form-label">code_verifier</label>
+            <div class="param-hint">Enter the code verifier (43 to 128 characters, RFC 7636 section 4.1)</div>
+            <input asp-for="Verifier" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Calculate challenge</button>
+
+        @if (!string.IsNullOrEmpty(Model.Challenge))
+        {
+            <div class="mb-3 mt-4">
+                <label asp-for="Challenge" class="form-label">code_challenge</label>
+                <div class="param-hint">The calculated code challenge (SHA-256 hash + base64url encoding)</div>
+                <input asp-for="Challenge" class="form-control" readonly />
+            </div>
+        }
+    </form>
+</div>

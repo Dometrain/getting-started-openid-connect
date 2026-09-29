@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Call the API";
+}
+
+<div class="demo-page">
+    <h1>Call the secure API</h1>
+    <p class="text-muted">
+        Polling the time API once a second using the access token in session. When the token is
+        close to expiring, a new one is silently obtained using the refresh token.
+    </p>
+
+    <a asp-controller="Refresh" asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">Log in again to get a new access token</a>
+
+    <ul id="Content" class="list-group"></ul>
+</div>
+
+@section Scripts {
+    <script src="~/js/refresh.js"></script>
+}

@@ -1,0 +1,20 @@
+### Create a private RSA with different key sizes
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private2048.pem
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out private3072.pem
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out private4096.pem
+
+
+### Export the RSA key parameters to a text file
+openssl rsa -in private2048.pem -text -noout -out private2048.txt
+
+
+### Extract the public key
+openssl rsa -in private2048.pem -pubout -out public2048.pem
+openssl rsa -in private3072.pem -pubout -out public3072.pem
+openssl rsa -in private4096.pem -pubout -out public4096.pem
+
+
+### Export the public RSA key parameters to a text file
+openssl rsa -pubin -in public2048.pem -text -noout -out public2048.txt
+openssl rsa -pubin -in public3072.pem -text -noout -out public3072.txt
+openssl rsa -pubin -in public4096.pem -text -noout -out public4096.txt

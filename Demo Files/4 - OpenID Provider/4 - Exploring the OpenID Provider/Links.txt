@@ -1,0 +1,8 @@
+https://gitlab.com/.well-known/openid-configuration
+https://accounts.google.com/.well-known/openid-configuration
+https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration
+https://www.paypalobjects.com/.well-known/openid-configuration
+https://appleid.apple.com/.well-known/openid-configuration
+
+
+Link to: https://jsonformatter.org/

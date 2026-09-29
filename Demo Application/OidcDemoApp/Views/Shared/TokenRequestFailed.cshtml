@@ -1,0 +1,89 @@
+@model OidcDemoApp.Models.TokenRequestError
+
+@{
+    ViewData["Title"] = "Failed to Request the Tokens";
+
+    // The view is shared, so the way back is whichever flow got here rather than a fixed one.
+    var flow = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Home";
+}
+
+<div class="demo-page">
+    <h1 class="mt-4 text-danger">Failed to request the tokens</h1>
+    <p>
+        The token endpoint refused this request, so no tokens were issued. This is the
+        authorization server's own answer, shown exactly as it arrived.
+    </p>
+
+    <table class="table table-bordered param-table">
+        <tr>
+            <th>Endpoint</th>
+            <td class="token-value">POST @Model.Endpoint</td>
+        </tr>
+        <tr>
+            <th>HTTP status</th>
+            <td>@Model.StatusCode</td>
+        </tr>
+        @if (Model.Error != null)
+        {
+            <tr>
+                <th>error</th>
+                <td><code>@Model.Error</code></td>
+            </tr>
+        }
+        @if (Model.ErrorDescription != null)
+        {
+            <tr>
+                <th>error_description</th>
+                <td>@Model.ErrorDescription</td>
+            </tr>
+        }
+    </table>
+
+    @if (Model.RawBody != null)
+    {
+        <label class="form-label fw-semibold">The raw response body</label>
+        <pre class="jwt-box token-value mb-2">@Model.RawBody</pre>
+        <div class="param-hint">
+            RFC 6749 section 5.2 is what defines this shape: a 400 with a JSON object carrying an
+            <code>error</code> code. The <code>error_description</code> beside it is optional, and
+            servers often leave it out on purpose, because an exact explanation of why a grant was
+            rejected would also tell an attacker which part of their attempt to fix.
+        </div>
+    }
+
+    @if (Model.Error == "invalid_grant")
+    {
+        <h2 class="h5 mt-4">What usually causes <code>invalid_grant</code> here</h2>
+        <ul>
+            @if (flow == "CodeFlowPkce")
+            {
+                <li>
+                    The <code>code_verifier</code> was missing, or it does not match the
+                    <code>code_challenge</code> that was sent to the authorize endpoint. That is
+                    PKCE doing its job.
+                </li>
+            }
+            <li>
+                The authorization code has already been exchanged. Codes are single use, and a
+                second attempt with the same one is refused.
+            </li>
+            <li>
+                The code expired. They are deliberately short lived, usually about a minute.
+            </li>
+            <li>
+                The <code>redirect_uri</code> does not exactly match the one used in the authorize
+                request.
+            </li>
+        </ul>
+        <p class="param-hint">
+            Notice that the response does not say which of these it was. That is deliberate on the
+            server's part, and it is why reading the request you sent matters more than reading the
+            error you got back.
+        </p>
+    }
+
+    <div class="mt-4">
+        <a asp-controller="@flow" asp-action="Index" class="btn btn-primary">Start the flow again</a>
+        <a asp-controller="BackChannelLog" asp-action="Index" class="btn btn-outline-secondary ms-1">See the back-channel call</a>
+    </div>
+</div>

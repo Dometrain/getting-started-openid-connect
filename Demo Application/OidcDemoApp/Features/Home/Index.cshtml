@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="demo-page">
+    <h1>OIDC and OAuth flow demos</h1>
+    <p class="text-muted">Pick a flow below to build a login link by hand and watch the raw HTTP traffic. The tools for inspecting tokens, URLs and back-channel calls are in the Tools menu above.</p>
+
+    <h2 class="h4 mt-4">Flows</h2>
+    <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Implicit flow (fragment)</h3>
+                    <p class="card-text small text-muted">Tokens are returned in the URL fragment. Deprecated, kept here to show why.</p>
+                    <a asp-controller="ImplicitFlow" asp-action="Index" class="btn btn-sm btn-outline-primary">Try it</a>
+                    <a asp-controller="ImplicitFlow" asp-action="DirectFragment" class="btn btn-sm btn-outline-secondary ms-1">Direct</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Implicit flow (form post)</h3>
+                    <p class="card-text small text-muted">Same flow, but the tokens are posted back to the app instead of appearing in the URL.</p>
+                    <a asp-controller="ImplicitFlow" asp-action="Postback" class="btn btn-sm btn-outline-primary">Try it</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Authorization code flow</h3>
+                    <p class="card-text small text-muted">The standard flow: get a code, then exchange it for tokens on the back channel.</p>
+                    <a asp-controller="CodeFlow" asp-action="Index" class="btn btn-sm btn-outline-primary">Try it</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Authorization code flow + PKCE</h3>
+                    <p class="card-text small text-muted">The recommended flow for public clients, adding a code verifier and challenge.</p>
+                    <a asp-controller="CodeFlowPkce" asp-action="Index" class="btn btn-sm btn-outline-primary">Try it</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Client credentials flow</h3>
+                    <p class="card-text small text-muted">Machine-to-machine access with just a client id and secret, no user involved.</p>
+                    <a asp-controller="ClientCredentials" asp-action="Index" class="btn btn-sm btn-outline-primary">Try it</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Refresh tokens</h3>
+                    <p class="card-text small text-muted">Get a refresh token with <code>offline_access</code>, then use it to silently get new access tokens.</p>
+                    <a asp-controller="Refresh" asp-action="Index" class="btn btn-sm btn-outline-primary">Try it</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Combining the flows</h3>
+                    <p class="card-text small text-muted">One client holding two tokens: its own for background work, and the signed-in user's for work done on their behalf.</p>
+                    <a asp-controller="CombinedFlows" asp-action="Index" class="btn btn-sm btn-outline-primary">Try it</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

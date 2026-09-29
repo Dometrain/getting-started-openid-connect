@@ -1,0 +1,73 @@
+@model OidcDemoApp.Features.ClientCredentials.ClientCredentialRequest
+@{
+    ViewData["Title"] = "Client Credentials Flow";
+}
+
+<div class="demo-page">
+    <h1>Client credentials flow</h1>
+    <p class="text-muted">Machine-to-machine access: request an access token directly with a client id and secret, then call the API with it.</p>
+
+    <form asp-controller="ClientCredentials" asp-action="GetAccessToken" method="post">
+        <h2 class="h4 mt-4">Request an access token</h2>
+
+        <div class="mb-3">
+            <label asp-for="GrantType" class="form-label">grant_type</label>
+            <div class="param-hint">Which flow to ask for</div>
+            <input asp-for="GrantType" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ClientId" class="form-label">client_id</label>
+            <div class="param-hint">The client identifier</div>
+            <input asp-for="ClientId" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ClientSecret" class="form-label">client_secret</label>
+            <div class="param-hint">Client secret password</div>
+            <input asp-for="ClientSecret" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Scope" class="form-label">scope</label>
+            <div class="param-hint">The scopes to ask for</div>
+            <input asp-for="Scope" class="form-control" />
+        </div>
+
+        <button type="submit" name="getaccesstoken" value="Get access token" class="btn btn-primary">Get access token</button>
+
+        @if (Model?.Token != null)
+        {
+            <h2 class="h4 mt-4">Access token</h2>
+
+            <div class="mb-3">
+                <label asp-for="Token!.AccessToken" class="form-label">access_token</label>
+                <textarea asp-for="Token!.AccessToken" class="form-control token-value" rows="6"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Token!.ExpiresIn" class="form-label">expires_in (seconds)</label>
+                <input asp-for="Token!.ExpiresIn" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Token!.TokenType" class="form-label">token_type</label>
+                <input asp-for="Token!.TokenType" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Token!.Scope" class="form-label">scope</label>
+                <input asp-for="Token!.Scope" class="form-control" />
+            </div>
+
+            <button type="submit" name="useaccesstoken" value="Use access token" class="btn btn-primary">Use access token</button>
+        }
+    </form>
+
+    @if (Model?.ApiResult != null)
+    {
+        <h2 class="h4 mt-4">API request result</h2>
+        <p>Calling API at <code>@Settings.APIEndpoint</code></p>
+        <pre class="token-value">@Model.ApiResult</pre>
+    }
+</div>

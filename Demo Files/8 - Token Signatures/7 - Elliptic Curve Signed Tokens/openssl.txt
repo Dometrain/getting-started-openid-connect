@@ -1,0 +1,20 @@
+### Create private EC keys using different curves
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out p256-private.pem
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-384 -out p384-private.pem
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-521 -out p521-private.pem
+
+### Export the EC private key parameters to text files
+openssl ec -in p256-private.pem -text -noout -out p256-private.txt
+openssl ec -in p384-private.pem -text -noout -out p384-private.txt
+openssl ec -in p521-private.pem -text -noout -out p521-private.txt
+
+### Extract the public EC keys
+openssl ec -in p256-private.pem -pubout -out p256-public.pem
+openssl ec -in p384-private.pem -pubout -out p384-public.pem
+openssl ec -in p521-private.pem -pubout -out p521-public.pem
+
+### Export the public EC key parameters to text files
+openssl ec -pubin -in p256-public.pem -text -noout -out p256-public.txt
+openssl ec -pubin -in p384-public.pem -text -noout -out p384-public.txt
+openssl ec -pubin -in p521-public.pem -text -noout -out p521-public.txt
+

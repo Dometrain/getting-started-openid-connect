@@ -1,0 +1,42 @@
+@model OidcDemoApp.Models.OidcTokenResponse
+@using Flurl
+
+@{
+    string JwtIoLink(string? token) => new Url("https://jwt.io").SetFragment("value=" + token);
+}
+
+<table class="table table-bordered param-table">
+    <tr>
+        <th>scope</th>
+        <td>@Model.Scope</td>
+    </tr>
+    <tr>
+        <th>expires_in</th>
+        <td>@Model.ExpiresIn</td>
+    </tr>
+    <tr>
+        <th>token_type</th>
+        <td>@Model.TokenType</td>
+    </tr>
+    <tr>
+        <th>
+            id_token<br />
+            <a href="@JwtIoLink(Model.IdToken)" target="_blank">Inspect on jwt.io</a>
+        </th>
+        <td class="token-value">@Model.IdToken</td>
+    </tr>
+    <tr>
+        <th>
+            access_token<br />
+            <a href="@JwtIoLink(Model.AccessToken)" target="_blank">Inspect on jwt.io</a>
+        </th>
+        <td class="token-value">@Model.AccessToken</td>
+    </tr>
+    @if (!string.IsNullOrEmpty(Model.RefreshToken))
+    {
+        <tr>
+            <th>refresh_token</th>
+            <td class="token-value">@Model.RefreshToken</td>
+        </tr>
+    }
+</table>

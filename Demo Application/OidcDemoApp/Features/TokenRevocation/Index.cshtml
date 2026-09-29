@@ -1,0 +1,84 @@
+@model OidcDemoApp.Features.TokenRevocation.TokenRevocationViewModel
+@{
+    ViewData["Title"] = "Token Revocation";
+}
+
+<div class="demo-page">
+    <h1>Token revocation</h1>
+    <p class="text-muted">
+        Send a token to the revocation endpoint (RFC 7009) and the authorization server throws it away.
+    </p>
+
+    <form asp-controller="TokenRevocation" asp-action="Index" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="ClientId" class="form-label"></label>
+            <div class="param-hint">The client the token was issued to</div>
+            <input asp-for="ClientId" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ClientSecret" class="form-label"></label>
+            <input asp-for="ClientSecret" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Token" class="form-label">token</label>
+            @if (Model.TokenCameFromSession)
+            {
+                <div class="param-hint">
+                    Prefilled from the <a asp-controller="Refresh" asp-action="Index">refresh token demo</a>
+                </div>
+            }
+            else
+            {
+                <div class="param-hint">
+                    Paste a refresh token, or run the <a asp-controller="Refresh" asp-action="Index">refresh token demo</a> first
+                </div>
+            }
+            <textarea asp-for="Token" class="form-control token-value" rows="6"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TokenTypeHint" class="form-label"></label>
+            <select asp-for="TokenTypeHint" class="form-select">
+                <option value="">(omit)</option>
+                <option value="refresh_token">refresh_token</option>
+                <option value="access_token">access_token</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-danger">Revoke token</button>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Error))
+    {
+        <div class="alert alert-danger mt-4">@Model.Error</div>
+    }
+
+    @if (Model.StatusCode != null)
+    {
+        <h2 class="h4 mt-4">Request</h2>
+        <p class="text-muted mb-2">
+            <code>POST @(OidcDemoApp.Settings.OIDCServer)/connect/revocation</code>
+        </p>
+        <pre class="token-value">@Model.RequestBody</pre>
+
+        <h2 class="h4 mt-4">Response</h2>
+        @if (Model.IsSuccess)
+        {
+            <div class="alert alert-success">
+                <strong>200 OK</strong>. Note that RFC 7009 also answers <code>200</code> for a token
+                that never existed, so this alone does not prove the revocation hit anything.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <strong>HTTP @Model.StatusCode</strong>. The request was rejected.
+            </div>
+        }
+        <pre class="token-value">@Model.RawResult</pre>
+    }
+</div>
